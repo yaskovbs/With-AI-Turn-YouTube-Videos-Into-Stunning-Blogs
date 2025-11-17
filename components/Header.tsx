@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   MOON_ICON,
   SUN_ICON,
+  SYSTEM_ICON,
   BLOG_ICON,
   IMAGE_GENERATOR_ICON,
   IMAGE_EDITOR_ICON,
@@ -21,7 +22,8 @@ import {
 
 
 const Header = (props) => {
-  const { isLoggedIn, onLoginToggle, isDarkMode, onDarkModeToggle, currentView, onViewChange, currentUser } = props;
+  const { isLoggedIn, onLoginToggle, themeMode, onThemeModeChange, currentView, onViewChange, currentUser } = props;
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
 
   const navItems = [
     { name: 'בית', icon: HOME_ICON, view: 'home' },
@@ -59,13 +61,48 @@ const Header = (props) => {
         'div',
         { className: 'flex items-center space-x-4 md:hidden' },
         React.createElement(
-          'button',
-          {
-            onClick: onDarkModeToggle,
-            'aria-label': isDarkMode ? 'Switch to light mode' : 'Switch to dark mode',
-            className: 'p-2 rounded-full hover:bg-gray-700 transition-colors duration-200',
-          },
-          isDarkMode ? SUN_ICON : MOON_ICON,
+          'div',
+          { className: 'relative' },
+          React.createElement(
+            'button',
+            {
+              onClick: () => setShowThemeMenu(!showThemeMenu),
+              'aria-label': 'Toggle theme menu',
+              className: 'p-2 rounded-full hover:bg-gray-700 transition-colors duration-200',
+            },
+            themeMode === 'light' ? SUN_ICON : themeMode === 'dark' ? MOON_ICON : SYSTEM_ICON,
+          ),
+          showThemeMenu && React.createElement(
+            'div',
+            { className: 'absolute right-0 mt-2 w-32 bg-gray-700 rounded-lg shadow-lg z-50' },
+            React.createElement(
+              'button',
+              {
+                onClick: () => { onThemeModeChange('light'); setShowThemeMenu(false); },
+                className: `w-full text-left px-4 py-2 hover:bg-gray-600 transition-colors ${themeMode === 'light' ? 'bg-blue-600' : ''} rounded-t-lg flex items-center space-x-2`,
+              },
+              SUN_ICON,
+              React.createElement('span', null, 'Light'),
+            ),
+            React.createElement(
+              'button',
+              {
+                onClick: () => { onThemeModeChange('dark'); setShowThemeMenu(false); },
+                className: `w-full text-left px-4 py-2 hover:bg-gray-600 transition-colors ${themeMode === 'dark' ? 'bg-blue-600' : ''} flex items-center space-x-2`,
+              },
+              MOON_ICON,
+              React.createElement('span', null, 'Dark'),
+            ),
+            React.createElement(
+              'button',
+              {
+                onClick: () => { onThemeModeChange('system'); setShowThemeMenu(false); },
+                className: `w-full text-left px-4 py-2 hover:bg-gray-600 transition-colors ${themeMode === 'system' ? 'bg-blue-600' : ''} rounded-b-lg flex items-center space-x-2`,
+              },
+              SYSTEM_ICON,
+              React.createElement('span', null, 'System'),
+            ),
+          ),
         ),
         React.createElement(
           'button',
@@ -131,13 +168,47 @@ const Header = (props) => {
         React.createElement('span', { className: 'text-sm font-medium' }, currentUser.name),
       ),
       React.createElement(
-        'button',
-        {
-          onClick: onDarkModeToggle,
-          'aria-label': isDarkMode ? 'Switch to light mode' : 'Switch to dark mode',
-          className: 'p-2 rounded-full hover:bg-gray-700 transition-colors duration-200',
-        },
-        isDarkMode ? SUN_ICON : MOON_ICON,
+        'div',
+        { className: 'relative group' },
+        React.createElement(
+          'button',
+          {
+            'aria-label': 'Theme menu',
+            className: 'p-2 rounded-full hover:bg-gray-700 transition-colors duration-200',
+          },
+          themeMode === 'light' ? SUN_ICON : themeMode === 'dark' ? MOON_ICON : SYSTEM_ICON,
+        ),
+        React.createElement(
+          'div',
+          { className: 'absolute right-0 mt-0 w-32 bg-gray-700 rounded-lg shadow-lg z-50 hidden group-hover:block' },
+          React.createElement(
+            'button',
+            {
+              onClick: () => onThemeModeChange('light'),
+              className: `w-full text-left px-4 py-2 hover:bg-gray-600 transition-colors ${themeMode === 'light' ? 'bg-blue-600' : ''} rounded-t-lg flex items-center space-x-2`,
+            },
+            SUN_ICON,
+            React.createElement('span', null, 'Light'),
+          ),
+          React.createElement(
+            'button',
+            {
+              onClick: () => onThemeModeChange('dark'),
+              className: `w-full text-left px-4 py-2 hover:bg-gray-600 transition-colors ${themeMode === 'dark' ? 'bg-blue-600' : ''} flex items-center space-x-2`,
+            },
+            MOON_ICON,
+            React.createElement('span', null, 'Dark'),
+          ),
+          React.createElement(
+            'button',
+            {
+              onClick: () => onThemeModeChange('system'),
+              className: `w-full text-left px-4 py-2 hover:bg-gray-600 transition-colors ${themeMode === 'system' ? 'bg-blue-600' : ''} rounded-b-lg flex items-center space-x-2`,
+            },
+            SYSTEM_ICON,
+            React.createElement('span', null, 'System'),
+          ),
+        ),
       ),
       React.createElement(
         'button',

@@ -359,3 +359,20 @@ export const LEGAL_ICON = React.createElement(
     d: 'M12 21.75V4.5m0 17.25c4.72 0 8.5-3.003 8.5-6.75S16.72 8.25 12 8.25M12 21.75c-4.72 0-8.5-3.003-8.5-6.75S7.28 8.25 12 8.25m0-4.5c1.133 0 2.185.178 3.16.49M12 4.5c-1.133 0-2.185.178-3.16.49M12 4.5v3.75m0 0C8.28 8.25 4.5 11.253 4.5 15c0 3.75 3.78 6.75 7.5 6.75m0-17.25C15.72 4.5 19.5 7.503 19.5 11.25c0 3.75-3.78 6.75-7.5 6.75',
   }),
 );
+
+export const SYSTEM_ICON = React.createElement(
+  'svg',
+  {
+    xmlns: 'http://www.w3.org/2000/svg',
+    fill: 'none',
+    viewBox: '0 0 24 24',
+    strokeWidth: 1.5,
+    stroke: 'currentColor',
+    className: 'h-6 w-6',
+  },
+  React.createElement('path', {
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    d: 'M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 5v14a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 19V5z',
+  }),
+);

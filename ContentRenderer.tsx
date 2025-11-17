@@ -37,6 +37,7 @@ interface ContentRendererProps {
   handleDownloadPdf: () => void;
   handleCopyBlog: () => void;
   handleShareBlog: () => void;
+  isDarkMode?: boolean;
 }
 
 const ContentRenderer: React.FC<ContentRendererProps> = ({
@@ -60,6 +61,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   handleDownloadPdf,
   handleCopyBlog,
   handleShareBlog,
+  isDarkMode = true,
 }) => {
   if (!isLoggedIn && currentView !== 'home' && currentView !== 'faq' && currentView !== 'contact' && currentView !== 'terms' && currentView !== 'privacy' && currentView !== 'youtube-channel' && currentView !== 'api-key') {
     return React.createElement(
@@ -71,7 +73,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
 
   switch (currentView) {
     case 'home':
-      return React.createElement(Home, { showToast });
+      return React.createElement(Home, { showToast, isDarkMode });
     case 'blog':
       return React.createElement(
         'section',

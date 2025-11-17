@@ -7,6 +7,7 @@ import { initGoogleSignIn, signIn, signOut } from './services/authService';
 import { getYouTubeVideoId } from './utils/youtube';
 import { createHandlers, createShowToast } from './handlers';
 import ContentRenderer from './ContentRenderer';
+import { applyTheme, getEffectiveTheme, type ThemeMode } from './utils/theme';
 
 function App() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -18,7 +19,7 @@ function App() {
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null); // New state for current user
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Default to not logged in
-  const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark mode
+  const [themeMode, setThemeMode] = useState<ThemeMode>('system'); // Default to system theme
   const [showVideoEmbed, setShowVideoEmbed] = useState(false);
   const [currentView, setCurrentView] = useState('home'); // Default view to 'home'
   const [toast, setToast] = useState(null); // New state for toast notifications
@@ -50,9 +51,9 @@ function App() {
 
   // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('isDarkMode');
-    if (savedTheme !== null) {
-      setIsDarkMode(JSON.parse(savedTheme));
+    const savedTheme = localStorage.getItem('themeMode') as ThemeMode | null;
+    if (savedTheme) {
+      setThemeMode(savedTheme);
     }
 
     const storedUser = localStorage.getItem('userProfile');
@@ -64,7 +65,6 @@ function App() {
 
     initGoogleSignIn(
       (authResult) => {
-        // This is called when user signs in via prompt or initTokenClient
         console.log("Signed in:", authResult);
         setCurrentUser(authResult.profile);
         setIsLoggedIn(true);
@@ -80,27 +80,28 @@ function App() {
       }
     );
 
+    // Watch system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (themeMode === 'system') {
+        applyTheme('system');
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // Apply dark/light mode classes to the body and save to localStorage
+  // Apply theme classes to the body and save to localStorage
   useEffect(() => {
-    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('bg-gray-900', 'text-white');
-      document.body.classList.remove('bg-white', 'text-gray-900');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.add('bg-white', 'text-gray-900');
-      document.body.classList.remove('bg-gray-900', 'text-white');
-    }
-  }, [isDarkMode]);
+    localStorage.setItem('themeMode', themeMode);
+    applyTheme(themeMode);
+  }, [themeMode]);
 
   const handleLoginToggle = (loggedIn) => {
     if (loggedIn) {
-      signIn(); // Initiates Google Sign-In flow
+      signIn();
     } else {
-      signOut(); // Initiates Google Sign-Out
+      signOut();
       setCurrentUser(null);
       setIsLoggedIn(false);
       localStorage.removeItem('userProfile');
@@ -108,13 +109,15 @@ function App() {
     setError(null);
   };
 
-  const handleDarkModeToggle = () => {
-    setIsDarkMode((prev) => !prev);
+  const handleThemeModeChange = (mode: ThemeMode) => {
+    setThemeMode(mode);
   };
 
+  const effectiveTheme = getEffectiveTheme(themeMode);
+  const isDarkMode = effectiveTheme === 'dark';
+
   const videoId = getYouTubeVideoId(youtubeUrl);
-  // Disabled if not logged in, URL is empty, or if an invalid YouTube ID
-  const isGenerateDisabled = isLoading || !isLoggedIn || !youtubeUrl.trim() || !videoId; // Changed to youtubeUrl.trim() and videoId check
+  const isGenerateDisabled = isLoading || !isLoggedIn || !youtubeUrl.trim() || !videoId;
 
   return React.createElement(
     'div',
@@ -126,11 +129,11 @@ function App() {
     React.createElement(Header, {
       isLoggedIn: isLoggedIn,
       onLoginToggle: handleLoginToggle,
-      isDarkMode: isDarkMode,
-      onDarkModeToggle: handleDarkModeToggle,
+      themeMode: themeMode,
+      onThemeModeChange: handleThemeModeChange,
       currentView: currentView,
       onViewChange: setCurrentView,
-      currentUser: currentUser, // Pass currentUser to Header
+      currentUser: currentUser,
     }),
     React.createElement(
       'main',
@@ -156,6 +159,7 @@ function App() {
         handleDownloadPdf,
         handleCopyBlog,
         handleShareBlog,
+        isDarkMode,
       }))
     ),
     React.createElement(
